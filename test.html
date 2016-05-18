@@ -1,0 +1,74 @@
+<html>
+	<head>
+		<title>test</title>
+		<script type='text/javascript' src='https://code.createjs.com/easeljs-0.8.2.min.js'></script>
+	</head>
+	<body onload='init();'>
+		<canvas id='demoCanvas' width='500' height='300'></canvas>
+		<script type='text/javascript'>
+			function init() {
+				var stage = new createjs.Stage('demoCanvas');
+	
+				//
+				var circle = new createjs.Shape();
+				circle.graphics.beginFill("DeepSkyBlue").drawCircle(0, 0, 50);
+				circle.x = 100;
+				circle.y = 100;
+//				stage.addChild(circle);
+				
+				//
+				var text = new createjs.Text('Hello World!', '32px Serif', 'Red');
+//				stage.addChild(text);
+				
+				//
+				
+				// 
+				var date = new Date();
+				var year = date.getFullYear();
+				var month = date.getMonth() + 1;
+				var day = date.getDate();
+				
+				var m = new Date(date.getFullYear(), date.getMonth(), 1);
+				var m2 = new Date(date.getFullYear(), date.getMonth() + 1, 1);
+				
+				var eod = new Date(date.getFullYear(), date.getMonth()+1, 0);
+				var days = eod.getDate();
+								
+//				console.log(date.getYear());				
+				var text2 = new createjs.Text(year+"/"+month+"/"+day, '32px Serif', 'Blue');
+				text2.x = 50;
+				text2.y = 50;
+				stage.addChild(text2);
+				
+				var cell = new createjs.Point(32, 32);
+				
+				function cellPos(i) {
+					var x = i%7;
+					var y = parseInt(i/7);
+					return new createjs.Point(x*(cell.x + 4), 100+y*(cell.y + 4));
+				}
+				var i;
+				for (i=0; i<days; i++) {
+					var rect = new createjs.Shape();
+					var pos = cellPos(i + m.getDay());
+					rect.graphics.beginStroke('black').beginFill("#aaaaaa").drawRect(pos.x, pos.y, cell.x, cell.y);
+					stage.addChild(rect);
+					
+					var text = new createjs.Text(i+1, "24px Serif", "Red");
+					var r = text.getBounds();
+					text.x = pos.x + (cell.x - r.width)/2;
+					text.y = pos.y + (cell.y - r.height)/2;
+					stage.addChild(text);
+					
+				}
+				
+
+				
+				
+				//
+				stage.update();
+			}
+		</script>
+		test test test 
+	</body>
+</html>
