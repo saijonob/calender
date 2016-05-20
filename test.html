@@ -6,6 +6,11 @@
 	<body onload='init();'>
 		<canvas id='demoCanvas' width='500' height='300'></canvas>
 		<script type='text/javascript'>
+            var data = [
+                { id:1, name:"Test 1", start: new Date(2016,4,2), end: new Date(2016,4,7) },
+                { id:2, name:"Test 2", start: new Date(2016,4,11), end: new Date(2016,4,13) },
+            ];
+                        
 			function init() {
 				var stage = new createjs.Stage('demoCanvas');
 	
@@ -41,16 +46,30 @@
 				stage.addChild(text2);
 				
 				var cell = new createjs.Point(32, 32);
+                
+                // 週インデックス計算
+                function weekIndex(i) {
+                    var j = i + m.getDay();
+                    return parseInt(j/7);
+                }
 				
 				function cellPos(i) {
-					var x = i%7;
-					var y = parseInt(i/7);
+                    var j = i + m.getDay();
+					var x = j%7;
+					var y = parseInt(j/7);
 					return new createjs.Point(x*(cell.x + 4), 100+y*(cell.y + 4));
 				}
+                
+                // 週開始位置
+                function weekStartDate(i) {
+                    return new Date(m.getFullYear(), m.getMonth(), 1-m.getDay() + i*7);
+                }
+                
+                // カレンダー
 				var i;
 				for (i=0; i<days; i++) {
 					var rect = new createjs.Shape();
-					var pos = cellPos(i + m.getDay());
+					var pos = cellPos(i);
 					rect.graphics.beginStroke('black').beginFill("#aaaaaa").drawRect(pos.x, pos.y, cell.x, cell.y);
 					stage.addChild(rect);
 					
@@ -61,14 +80,46 @@
 					stage.addChild(text);
 					
 				}
-				
+                
+                console.log(weekStartDate(-1));
+                console.log(weekStartDate(0));
+                console.log(weekStartDate(1));
 
-				
+                // 予定
+                var j;
+                for (j=0; j<data.length; j++) {
+                    var d = data[j];
+                    
+                    var startDay = d.start.getDate()-1;
+                    var endDay   = d.end.getDate()-1;
+                    
+                    var startPos = cellPos(startDay);
+                    var endPos = cellPos(endDay);
+                    
+                    var sw = weekIndex(startDay/7);
+                    var ew = weekIndex(endDay/7);
+                    
+                    for (i=sw; i<=ew; i++) {
+                        if (sw==ew) {
+                            startPos = cellPos(startDay);
+                            endPos = cellPos(endDay);
+                            
+                            //
+                            var rect = new createjs.Shape();
+                            rect.graphics.beginStroke('blue').beginFill("#eeeeee").drawRect(startPos.x, startPos.y, endPos.x-startPos.x+cell.x, cell.y);
+                            stage.addChild(rect);
+                            
+                        } else if (i==sw) {
+                        } else if (i==ew) {
+                        } else { // 中間
+                        }
+                    }                    
+                }				
 				
 				//
 				stage.update();
 			}
 		</script>
-		test test test 
+		test test test abc
 	</body>
 </html>
