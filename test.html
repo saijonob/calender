@@ -7,8 +7,9 @@
 		<canvas id='demoCanvas' width='500' height='300'></canvas>
 		<script type='text/javascript'>
             var data = [
-                { id:1, name:"Test 1", start: new Date(2016,4,2), end: new Date(2016,4,7) },
-                { id:2, name:"Test 2", start: new Date(2016,4,11), end: new Date(2016,4,13) },
+                { id:1, name:"Test 1", start: new Date(2016,4,9), end: new Date(2016,4,18) },
+                { id:2, name:"Test 2", start: new Date(2016,4,20), end: new Date(2016,4,27) },
+                { id:3, name:"Test 3", start: new Date(2016,4,28), end: new Date(2016,4,30) },
             ];
                         
 			function init() {
@@ -60,9 +61,13 @@
 					return new createjs.Point(x*(cell.x + 4), 100+y*(cell.y + 4));
 				}
                 
-                // 週開始位置
+                // 週開始日
                 function weekStartDate(i) {
                     return new Date(m.getFullYear(), m.getMonth(), 1-m.getDay() + i*7);
+                }
+                // 週終了日
+                function weekEndDate(i) {
+                    return new Date(m.getFullYear(), m.getMonth(), 1-m.getDay() + i*7+6);
                 }
                 
                 // カレンダー
@@ -96,23 +101,42 @@
                     var startPos = cellPos(startDay);
                     var endPos = cellPos(endDay);
                     
-                    var sw = weekIndex(startDay/7);
-                    var ew = weekIndex(endDay/7);
+                    // 週インデックス
+                    var sw = weekIndex(startDay);
+                    var ew = weekIndex(endDay);
+                    
+                    console.log(startDay, sw, endDay, ew, parseInt(endDay/7));
                     
                     for (i=sw; i<=ew; i++) {
                         if (sw==ew) {
                             startPos = cellPos(startDay);
-                            endPos = cellPos(endDay);
-                            
-                            //
-                            var rect = new createjs.Shape();
-                            rect.graphics.beginStroke('blue').beginFill("#eeeeee").drawRect(startPos.x, startPos.y, endPos.x-startPos.x+cell.x, cell.y);
-                            stage.addChild(rect);
-                            
+                            endPos = cellPos(endDay);                            
                         } else if (i==sw) {
+                            console.log("i==sw", i);
+                            var ed = weekEndDate(sw);
+                            startPos = cellPos(startDay);
+                            endPos   = cellPos(ed.getDate()-1);                            
                         } else if (i==ew) {
+                            console.log("i==ew", i);
+                            var sd = weekStartDate(ew);
+                            startPos = cellPos(sd.getDate()-1);
+                            endPos   = cellPos(endDay);                            
                         } else { // 中間
+                            var sd = weekStartDate(i);
+                            var ed = weekEndDate(i);
+                            startPos = cellPos(sd.getDate()-1);
+                            endPos   = cellPos(ed.getDate()-1);
+                            
+                            console.log("sw!=ew", i, sd.getDate()-1, ed.getDate()-1);
                         }
+                        
+                        //
+                        var rect = new createjs.Shape();
+                        rect.alpha = 0.5;
+                        rect.graphics.beginStroke('blue').beginFill("#aaeeaa").drawRect(startPos.x, startPos.y, endPos.x-startPos.x+cell.x, cell.y);
+                        stage.addChild(rect);
+                        
+                        console.log("add", i);
                     }                    
                 }				
 				
