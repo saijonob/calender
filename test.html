@@ -6,14 +6,25 @@
 	<body onload='init();'>
 		<canvas id='demoCanvas' width='500' height='300'></canvas>
 		<script type='text/javascript'>
+			"use strict";
+			
             var data = [
                 { id:1, name:"Test 1", start: new Date(2016,4,9), end: new Date(2016,4,18) },
                 { id:2, name:"Test 2", start: new Date(2016,4,20), end: new Date(2016,4,27) },
                 { id:3, name:"Test 3", start: new Date(2016,4,28), end: new Date(2016,4,30) },
             ];
-                        
+												
 			function init() {
+				var _target = null;
 				var stage = new createjs.Stage('demoCanvas');
+				
+				stage.enableMouseOver();
+				
+				stage.addEventListener("stagemousemove", function(evt) {
+					if (_target) {
+						console.log("mousemove", _target.id);
+					}
+				});
 	
 				//
 				var circle = new createjs.Shape();
@@ -89,12 +100,10 @@
                 console.log(weekStartDate(-1));
                 console.log(weekStartDate(0));
                 console.log(weekStartDate(1));
-
-                // 予定
-                var j;
-                for (j=0; j<data.length; j++) {
-                    var d = data[j];
-                    
+				
+				//
+				function makeHits(d) {
+					var hits = [];
                     var startDay = d.start.getDate()-1;
                     var endDay   = d.end.getDate()-1;
                     
@@ -105,19 +114,19 @@
                     var sw = weekIndex(startDay);
                     var ew = weekIndex(endDay);
                     
-                    console.log(startDay, sw, endDay, ew, parseInt(endDay/7));
+//                    console.log(startDay, sw, endDay, ew, parseInt(endDay/7));
                     
                     for (i=sw; i<=ew; i++) {
                         if (sw==ew) {
                             startPos = cellPos(startDay);
                             endPos = cellPos(endDay);                            
                         } else if (i==sw) {
-                            console.log("i==sw", i);
+//                            console.log("i==sw", i);
                             var ed = weekEndDate(sw);
                             startPos = cellPos(startDay);
                             endPos   = cellPos(ed.getDate()-1);                            
                         } else if (i==ew) {
-                            console.log("i==ew", i);
+//                            console.log("i==ew", i);
                             var sd = weekStartDate(ew);
                             startPos = cellPos(sd.getDate()-1);
                             endPos   = cellPos(endDay);                            
@@ -127,15 +136,69 @@
                             startPos = cellPos(sd.getDate()-1);
                             endPos   = cellPos(ed.getDate()-1);
                             
-                            console.log("sw!=ew", i, sd.getDate()-1, ed.getDate()-1);
+//                            console.log("sw!=ew", i, sd.getDate()-1, ed.getDate()-1);
                         }
-                        
+						
+						hits.push(new createjs.Rectangle(startPos.x, startPos.y, endPos.x-startPos.x+cell.x, cell.y));
+					}
+					
+					return hits;
+				}
+				
+
+                // 予定
+                var j;
+                for (j=0; j<data.length; j++) {
+                    var d = data[j];
+					
+					var hits = makeHits(d);
+                                        
+                    for (i=0; i<hits.length; i++) {
+						var hit = hits[i];
                         //
                         var rect = new createjs.Shape();
                         rect.alpha = 0.5;
-                        rect.graphics.beginStroke('blue').beginFill("#aaeeaa").drawRect(startPos.x, startPos.y, endPos.x-startPos.x+cell.x, cell.y);
+                        rect.graphics.beginStroke('blue').beginFill("#aaeeaa").drawRect(hit.x, hit.y, hit.width, hit.height);
                         stage.addChild(rect);
+						
+						// event
+						rect.addEventListener("click", function (evt) {
+							console.log("click", evt.currentTarget.id);
+						});
+						
+						// mousedown
+						rect.addEventListener("mousedown", function(evt) {
+							console.log("mousedown", evt.currentTarget.id);							
+						});
+						
+						rect.addEventListener("pressmove", function(evt) {
+							console.log("pressmove", evt.currentTarget.id);
+						});
+						
+						rect.addEventListener("pressup", function(evt) {
+							console.log("pressup", evt.currentTarget.id);
+						});
+						
+						rect.addEventListener("mousemove", function(evt) {
+							console.log("mousemove", evt.currentTarget.id);
+						});
+						
+						rect.addEventListener("mouseover", function(evt) {
+							_target = evt.currentTarget;
+							console.log("mouseover", evt.currentTarget.id);
+							
+							_target.alpha = 1;
+							stage.update();
+						});
                         
+						rect.addEventListener("mouseout", function(evt) {
+							evt.currentTarget.alpha = 0.5;
+							stage.update();
+							
+							_target = null;
+							console.log("mouseout", evt.currentTarget.id);							
+						});
+						
                         console.log("add", i);
                     }                    
                 }				
