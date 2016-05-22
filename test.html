@@ -60,6 +60,7 @@
 				var cell = new createjs.Point(32, 32);
                 
                 // 週インデックス計算
+				// i : 日付番号
                 function weekIndex(i) {
                     var j = i + m.getDay();
                     return parseInt(j/7);
@@ -73,6 +74,7 @@
 				}
                 
                 // 週開始日
+				// i : 週番号
                 function weekStartDate(i) {
                     return new Date(m.getFullYear(), m.getMonth(), 1-m.getDay() + i*7);
                 }
@@ -151,39 +153,41 @@
                 for (j=0; j<data.length; j++) {
                     var d = data[j];
 					
+					var container = new createjs.Container();
 					var hits = makeHits(d);
                                         
                     for (i=0; i<hits.length; i++) {
 						var hit = hits[i];
                         //
                         var rect = new createjs.Shape();
-                        rect.alpha = 0.5;
                         rect.graphics.beginStroke('blue').beginFill("#aaeeaa").drawRect(hit.x, hit.y, hit.width, hit.height);
-                        stage.addChild(rect);
+						
+						container.addChild(rect);
+                        container.alpha = 0.5;
 						
 						// event
-						rect.addEventListener("click", function (evt) {
+						container.addEventListener("click", function (evt) {
 							console.log("click", evt.currentTarget.id);
 						});
 						
 						// mousedown
-						rect.addEventListener("mousedown", function(evt) {
+						container.addEventListener("mousedown", function(evt) {
 							console.log("mousedown", evt.currentTarget.id);							
 						});
 						
-						rect.addEventListener("pressmove", function(evt) {
+						container.addEventListener("pressmove", function(evt) {
 							console.log("pressmove", evt.currentTarget.id);
 						});
 						
-						rect.addEventListener("pressup", function(evt) {
+						container.addEventListener("pressup", function(evt) {
 							console.log("pressup", evt.currentTarget.id);
 						});
 						
-						rect.addEventListener("mousemove", function(evt) {
+						container.addEventListener("mousemove", function(evt) {
 							console.log("mousemove", evt.currentTarget.id);
 						});
 						
-						rect.addEventListener("mouseover", function(evt) {
+						container.addEventListener("mouseover", function(evt) {
 							_target = evt.currentTarget;
 							console.log("mouseover", evt.currentTarget.id);
 							
@@ -191,7 +195,7 @@
 							stage.update();
 						});
                         
-						rect.addEventListener("mouseout", function(evt) {
+						container.addEventListener("mouseout", function(evt) {
 							evt.currentTarget.alpha = 0.5;
 							stage.update();
 							
@@ -201,6 +205,8 @@
 						
                         console.log("add", i);
                     }                    
+					
+                    stage.addChild(container);					
                 }				
 				
 				//
